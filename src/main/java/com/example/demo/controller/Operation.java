@@ -7,19 +7,19 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class Operation {
     OperationBD operationBD = new SQLiteConnection();
-    @PostMapping(path = "/account/SavingsAccount")
+    @PostMapping(path = "/account/savings-account")
     public String createAccount(@RequestBody SavingsAccountDTO savingsAccount) {
         return operationBD.createCount(savingsAccount);
     }
-    @PutMapping (path = "/account/depositMoney/depositMoneyUser")
+    @PutMapping (path = "/account/deposit-money/deposit-moneyUser")
     public String depositMoney(@RequestBody DepositMoneyUserDto depositMoneyUserDto) {
         return operationBD.depositMoney(depositMoneyUserDto);
     }
-    @GetMapping(path = "/account/checkBalance/{accountNumber}")
+    @GetMapping(path = "/account/check-balance/{accountNumber}")
     public String checkBalance(@PathVariable int accountNumber) {
         return operationBD.checkBalance(accountNumber);
     }
-    @PutMapping (path = "/account/transferMoney/transferMoneyUser")
+    @PutMapping (path = "/account/transfer-money/transfer-money-user")
     public String transferMoney(@RequestBody TransferDTO transferData) {
         return operationBD.transferMoney(transferData);
     }
