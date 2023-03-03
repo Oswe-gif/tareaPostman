@@ -9,7 +9,7 @@ import java.sql.*;
 public class SQLiteConnection implements OperationBD{
 
     static Connection conn = null;
-    static String url = "jdbc:sqlite:ourdatabase";
+    static String url = "jdbc:sqlite:companydatabase";
     public static void connect() {
 
 
@@ -31,15 +31,19 @@ public class SQLiteConnection implements OperationBD{
     @Override
     public String createCount(SavingsAccountDTO account) {
 
-        String sql = "INSERT INTO users (Name,Document,CreationDate,AccountAmount,AccountNumber) VALUES(?,?,?,?,?)";
+        String sql = "INSERT INTO User (Name,Document) VALUES(?,?)";
+        String sql2 = "INSERT INTO Account (AccountNumber,AccountAmount,CreationDate,Document) VALUES(?,?,?,?)";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, account.ownerName);
             pstmt.setInt(2, account.ownerDocument);
-            pstmt.setString(3, account.creationDate);
-            pstmt.setInt(4, account.accountFunds);
-            pstmt.setInt(5, account.accountNumber);
             pstmt.executeUpdate();
+            PreparedStatement pstmt2 = conn.prepareStatement(sql2);
+            pstmt2.setInt(1, account.accountNumber);
+            pstmt2.setInt(2, account.accountFunds);
+            pstmt2.setString(3, account.creationDate);
+            pstmt2.setInt(4, account.ownerDocument );
+            pstmt2.executeUpdate();
             return "An account has been created: User:"+account.accountNumber+" "+ account.ownerDocument+ " "+account.creationDate+" "+account.accountFunds+" "+account.accountNumber;
 
 
@@ -53,7 +57,7 @@ public class SQLiteConnection implements OperationBD{
     @Override
     public String depositMoney(DepositMoneyUserDto depositMoneyUserDto) {
         
-        String sql = "UPDATE users SET AccountAmount = (AccountAmount + ? ) WHERE AccountNumber = ?";
+        String sql = "UPDATE Account SET AccountAmount = (AccountAmount + ? ) WHERE AccountNumber = ?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, depositMoneyUserDto.moneyAmount);
@@ -71,7 +75,7 @@ public class SQLiteConnection implements OperationBD{
 
     @Override
     public String checkBalance(int accountNumber) {
-        String sql = "SELECT Name, AccountAmount FROM Users where AccountNumber=?";
+        String sql = "SELECT u.Name, a.AccountAmount FROM User u, Account a where (a.AccountNumber=? and u.Document=a.Document)";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, accountNumber);
@@ -86,7 +90,7 @@ public class SQLiteConnection implements OperationBD{
 
     @Override
     public Integer getAccountAmount(int accountNumber) {
-        String sql = "SELECT AccountAmount FROM Users where AccountNumber=?";
+        String sql = "SELECT AccountAmount FROM Account where AccountNumber=?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, accountNumber);
@@ -101,10 +105,10 @@ public class SQLiteConnection implements OperationBD{
 
     @Override
     public String transferMoney(TransferDTO transferData) {
-        String sql = "UPDATE users SET AccountAmount = (AccountAmount - ? ) WHERE AccountNumber = ? AND SET AccountAmount = (AccountAmount + ? ) WHERE AccountNumber = ?";
+        String sql = "UPDATE Account SET AccountAmount = (AccountAmount - ? ) WHERE AccountNumber = ?";
         try {
             int amountSender=getAccountAmount(transferData.accountNumberSender);
-            if (amountSender>transferData.MoneyAmounttoSend) {
+            if (amountSender>=transferData.MoneyAmounttoSend) {
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, transferData.MoneyAmounttoSend);
                 pstmt.setInt(2, transferData.accountNumberSender);
@@ -131,7 +135,7 @@ public class SQLiteConnection implements OperationBD{
     }
     @Override
     public Boolean rechargeReceiverAccount(TransferDTO transferData) {
-        String sql = "UPDATE users SET AccountAmount = (AccountAmount + ? ) WHERE AccountNumber = ?";
+        String sql = "UPDATE Account SET AccountAmount = (AccountAmount + ? ) WHERE AccountNumber = ?";
         try {
             
             PreparedStatement pstmt = conn.prepareStatement(sql);
