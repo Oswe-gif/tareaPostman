@@ -9,5 +9,4 @@ public class DemoApplication {
 		SQLiteConnection.connect();
 		SpringApplication.run(DemoApplication.class, args);
 	}
-
 }
