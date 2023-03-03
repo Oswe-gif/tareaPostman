@@ -35,18 +35,22 @@ public class SQLiteConnection implements OperationBD {
                     + account.creationDate + " " + account.accountFunds + " " + account.accountNumber;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            return "check fields or data type";
+            return "check fields, data type or keys";
         }
     }
     @Override
     public String depositMoney(DepositMoneyUserDto depositMoneyUserDto) {
         String sql = "UPDATE Account SET AccountAmount = (AccountAmount + ? ) WHERE AccountNumber = ?";
+        String sql2= "select AccountAmount from Account where AccountNumber = ?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, depositMoneyUserDto.moneyAmount);
             pstmt.setInt(2, depositMoneyUserDto.accountNumber);
             pstmt.executeUpdate();
-            return "An account has been recharged ";
+            PreparedStatement pstmt2 = conn.prepareStatement(sql2);
+            pstmt2.setInt(1, depositMoneyUserDto.accountNumber);
+            ResultSet rs=pstmt2.executeQuery();
+            return "An account "+depositMoneyUserDto.accountNumber+" ha been recharged. Balance: $"+rs.getInt("AccountAmount");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             return "check fields or data type";
