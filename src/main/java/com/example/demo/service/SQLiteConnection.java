@@ -103,7 +103,7 @@ public class SQLiteConnection implements OperationBD{
     public String transferMoney(TransferDTO transferData) {
         String sql = "UPDATE users SET AccountAmount = (AccountAmount - ? ) WHERE AccountNumber = ? AND SET AccountAmount = (AccountAmount + ? ) WHERE AccountNumber = ?";
         try {
-            int amountSender=getAccountAmount(transferData.accountNumberSender)
+            int amountSender=getAccountAmount(transferData.accountNumberSender);
             if (amountSender>transferData.MoneyAmounttoSend) {
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, transferData.MoneyAmounttoSend);
