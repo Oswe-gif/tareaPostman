@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.controller.dto.DepositMoneyUserDto;
-import com.example.demo.controller.dto.MoneySenderDto;
+import com.example.demo.controller.dto.TransferDTO;
 import com.example.demo.controller.dto.SavingsAccountDTO;
 
 import java.sql.*;
@@ -85,7 +85,42 @@ public class SQLiteConnection implements OperationBD{
     }
 
     @Override
-    public String transferMoney(MoneySenderDto sender) {
-        return "devuelve";
+    public Integer getAccountAmount(int accountNumber) {
+        String sql = "SELECT AccountAmount FROM Users where AccountNumber=?";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, accountNumber);
+            ResultSet rs  = pstmt.executeQuery();
+            return rs.getInt("AccountAmount");
+
+        }catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return 0;
+        }
+    }
+
+    @Override
+    public String transferMoney(TransferDTO transferData) {
+        String sql = "UPDATE users SET AccountAmount = (AccountAmount - ? ) WHERE AccountNumber = ? AND SET AccountAmount = (AccountAmount + ? ) WHERE AccountNumber = ?";
+        try {
+            int amountSender=getAccountAmount(transferData.accountNumberSender)
+            if (amountSender>transferData.MoneyAmounttoSend) {
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, transferData.MoneyAmounttoSend);
+                pstmt.setInt(2, transferData.accountNumberSender);
+                pstmt.setInt(3, transferData.MoneyAmounttoSend);
+                pstmt.setInt(4, transferData.accountNumberReceiver);
+                pstmt.executeUpdate();
+                return "Account "+transferData.accountNumberSender+" has transferred "+transferData.MoneyAmounttoSend+" to account "+transferData.accountNumberReceiver;
+            }
+           
+            else{
+                return "Insufficient funds, cannot make the transfer";
+            }
+
+        }catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return "check fields or data type";
+        }
     }
 }

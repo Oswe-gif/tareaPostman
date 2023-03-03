@@ -1,8 +1,7 @@
 package com.example.demo.controller;
 
 
-import com.example.demo.controller.dto.DepositMoneyUserDto;
-import com.example.demo.controller.dto.SavingsAccountDTO;
+import com.example.demo.controller.dto.*;
 import com.example.demo.service.OperationBD;
 import com.example.demo.service.SQLiteConnection;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +25,11 @@ public class Operation {
         return operationBD.checkBalance(accountNumber);
 
     }
+    @PutMapping (path = "/account/transferMoney/transferMoneyUser")
+    public String transferMoney(@RequestBody TransferDTO transferData) {
+        return operationBD.transferMoney(transferData);
 
+    }
 
 
 
