@@ -108,12 +108,18 @@ public class SQLiteConnection implements OperationBD{
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, transferData.MoneyAmounttoSend);
                 pstmt.setInt(2, transferData.accountNumberSender);
-                pstmt.setInt(3, transferData.MoneyAmounttoSend);
-                pstmt.setInt(4, transferData.accountNumberReceiver);
                 pstmt.executeUpdate();
-                return "Account "+transferData.accountNumberSender+" has transferred "+transferData.MoneyAmounttoSend+" to account "+transferData.accountNumberReceiver;
+
+                Boolean its_recharged=rechargeReceiverAccount(transferData);
+                if (its_recharged) {
+                    return "Account "+transferData.accountNumberSender+" has transferred "+transferData.MoneyAmounttoSend+" to account "+transferData.accountNumberReceiver;
+
+                }
+                else{
+                    return "Transaction unable to complete";
+
+                }
             }
-           
             else{
                 return "Insufficient funds, cannot make the transfer";
             }
@@ -121,6 +127,23 @@ public class SQLiteConnection implements OperationBD{
         }catch (SQLException e) {
             System.out.println(e.getMessage());
             return "check fields or data type";
+        }
+    }
+    @Override
+    public Boolean rechargeReceiverAccount(TransferDTO transferData) {
+        String sql = "UPDATE users SET AccountAmount = (AccountAmount + ? ) WHERE AccountNumber = ?";
+        try {
+            
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, transferData.MoneyAmounttoSend);
+            pstmt.setInt(2, transferData.accountNumberReceiver);
+            pstmt.executeUpdate();
+            return true;
+            
+
+        }catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
         }
     }
 }

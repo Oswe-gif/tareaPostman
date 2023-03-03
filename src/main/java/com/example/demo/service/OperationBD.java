@@ -10,4 +10,5 @@ public interface OperationBD {
     String checkBalance(int accountNumber);
     String transferMoney(TransferDTO transferData);
     Integer getAccountAmount(int accountNumber);
+    Boolean rechargeReceiverAccount(TransferDTO transferData);
 }
