@@ -1,7 +1,11 @@
 package com.example.demo.controller.dto;
+import lombok.*;
 
+@Getter
+@Setter
 public class TransferDTO {
-    public int accountNumberSender;
-    public int MoneyAmounttoSend;
-    public int accountNumberReceiver;
+    private int accountNumberSender;
+    private int moneyAmountSend;
+    private int accountNumberReceiver;
+
 }

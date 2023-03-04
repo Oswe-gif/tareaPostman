@@ -4,6 +4,7 @@ import com.example.demo.controller.dto.TransferDTO;
 import com.example.demo.controller.dto.SavingsAccountDTO;
 import java.sql.*;
 
+
 public class SQLiteConnection implements OperationBD {
     static Connection conn = null;
     static String url = "jdbc:sqlite:companydatabase";
@@ -22,17 +23,17 @@ public class SQLiteConnection implements OperationBD {
         String sql2 = "INSERT INTO Account (AccountNumber,AccountAmount,CreationDate,Document) VALUES(?,?,?,?)";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, account.ownerName);
-            pstmt.setInt(2, account.ownerDocument);
+            pstmt.setString(1, account.getOwnerName());
+            pstmt.setInt(2, account.getOwnerDocument());
             pstmt.executeUpdate();
             PreparedStatement pstmt2 = conn.prepareStatement(sql2);
-            pstmt2.setInt(1, account.accountNumber);
-            pstmt2.setInt(2, account.accountFunds);
-            pstmt2.setString(3, account.creationDate);
-            pstmt2.setInt(4, account.ownerDocument);
+            pstmt2.setInt(1, account.getAccountNumber());
+            pstmt2.setInt(2, account.getAccountFunds());
+            pstmt2.setString(3, account.getCreationDate());
+            pstmt2.setInt(4, account.getOwnerDocument());
             pstmt2.executeUpdate();
-            return "An account has been created: User:" + account.accountNumber + " " + account.ownerDocument + " "
-                    + account.creationDate + " " + account.accountFunds + " " + account.accountNumber;
+            return "An account has been created: User:" + account.getAccountNumber() + " " + account.getOwnerDocument() + " "
+                    + account.getCreationDate() + " " + account.getAccountFunds() + " " + account.getAccountNumber();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             return "check fields, data type or keys";
@@ -44,13 +45,13 @@ public class SQLiteConnection implements OperationBD {
         String sql2= "select AccountAmount from Account where AccountNumber = ?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, depositMoneyUserDto.moneyAmount);
-            pstmt.setInt(2, depositMoneyUserDto.accountNumber);
+            pstmt.setInt(1, depositMoneyUserDto.getMoneyAmount());
+            pstmt.setInt(2, depositMoneyUserDto.getAccountNumber());
             pstmt.executeUpdate();
             PreparedStatement pstmt2 = conn.prepareStatement(sql2);
-            pstmt2.setInt(1, depositMoneyUserDto.accountNumber);
+            pstmt2.setInt(1, depositMoneyUserDto.getAccountNumber());
             ResultSet rs=pstmt2.executeQuery();
-            return "An account "+depositMoneyUserDto.accountNumber+" ha been recharged. Balance: $"+rs.getInt("AccountAmount");
+            return "An account "+depositMoneyUserDto.getAccountNumber()+" ha been recharged. Balance: $"+rs.getInt("AccountAmount");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             return "check fields or data type";
@@ -70,7 +71,7 @@ public class SQLiteConnection implements OperationBD {
         }
     }
     @Override
-    public Integer getAccountAmount(int accountNumber) {
+    public Integer getAccountAmount(int accountNumber) {//bien
         String sql = "SELECT AccountAmount FROM Account where AccountNumber=?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -86,16 +87,18 @@ public class SQLiteConnection implements OperationBD {
     public String transferMoney(TransferDTO transferData) {
         String sql = "UPDATE Account SET AccountAmount = (AccountAmount - ? ) WHERE AccountNumber = ?";
         try {
-            int amountSender = getAccountAmount(transferData.accountNumberSender);
-            if (amountSender >= transferData.MoneyAmounttoSend) {
+            int amountSender = getAccountAmount(transferData.getAccountNumberSender());//bien
+            System.out.println(transferData.getMoneyAmountSend());
+            if (amountSender >= transferData.getMoneyAmountSend()) {
+
                 PreparedStatement pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, transferData.MoneyAmounttoSend);
-                pstmt.setInt(2, transferData.accountNumberSender);
+                pstmt.setInt(1, transferData.getMoneyAmountSend());
+                pstmt.setInt(2, transferData.getAccountNumberSender());
                 pstmt.executeUpdate();
                 Boolean its_recharged = rechargeReceiverAccount(transferData);
                 if (its_recharged) {
-                    return "Account " + transferData.accountNumberSender + " has transferred "
-                            + transferData.MoneyAmounttoSend + " to account " + transferData.accountNumberReceiver;
+                    return "Account " + transferData.getAccountNumberSender() + " has transferred "
+                            + transferData.getMoneyAmountSend() + " to account " + transferData.getAccountNumberReceiver();
                 } else {
                     return "Transaction unable to complete";
                 }
@@ -112,8 +115,8 @@ public class SQLiteConnection implements OperationBD {
         String sql = "UPDATE Account SET AccountAmount = (AccountAmount + ? ) WHERE AccountNumber = ?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, transferData.MoneyAmounttoSend);
-            pstmt.setInt(2, transferData.accountNumberReceiver);
+            pstmt.setInt(1, transferData.getMoneyAmountSend());
+            pstmt.setInt(2, transferData.getAccountNumberReceiver());
             pstmt.executeUpdate();
             return true;
         } catch (SQLException e) {

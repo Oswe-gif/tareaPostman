@@ -1,9 +1,12 @@
 package com.example.demo.controller.dto;
+import lombok.*;
 
+@Getter
+@Setter
 public class SavingsAccountDTO {
-    public String ownerName;
-    public int ownerDocument;
-    public String creationDate;
-    public int accountFunds=0;
-    public int accountNumber;
+    private String ownerName;
+    private int ownerDocument;
+    private String creationDate;
+    private int accountFunds=0;
+    private int accountNumber;
 }

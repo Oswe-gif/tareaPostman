@@ -1,6 +1,12 @@
 package com.example.demo.controller.dto;
 
+import lombok.*;
+
+
+@Getter
+@Setter
 public class DepositMoneyUserDto {
-    public int moneyAmount;
-    public int accountNumber;
+    private int moneyAmount;
+    private int accountNumber;
+
 }
